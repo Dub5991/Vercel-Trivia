@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Container, Row, Col, Card, Button, Spinner, Form, Alert } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Spinner, Form, Alert, Table } from 'react-bootstrap';
 import axios from 'axios';
 
 const App = () => {
@@ -15,6 +15,7 @@ const App = () => {
   const [feedback, setFeedback] = useState(null); // Feedback for correct/incorrect answers
   const [answerColors, setAnswerColors] = useState({}); // Colors for answer validation
   const [isPaused, setIsPaused] = useState(false); // Pause state for the timer
+  const [scoreboard, setScoreboard] = useState([]); // Scoreboard to track scores
 
   // Fetch trivia categories
   const fetchCategories = async () => {
@@ -60,6 +61,9 @@ const App = () => {
 
   useEffect(() => {
     fetchCategories();
+    // Load scoreboard from localStorage
+    const savedScores = JSON.parse(localStorage.getItem('scoreboard')) || [];
+    setScoreboard(savedScores);
   }, []);
 
   // Timer logic
@@ -68,7 +72,7 @@ const App = () => {
       const timer = setTimeout(() => setTimeLeft((prev) => prev - 1), 1000);
       return () => clearTimeout(timer);
     } else if (timeLeft === 0) {
-      setGameStarted(false);
+      endGame(); // End game when time runs out
     }
   }, [timeLeft, gameStarted, isPaused]);
 
@@ -101,10 +105,17 @@ const App = () => {
       setIsPaused(false); // Resume the timer after the transition
       if (currentQuestionIndex < trivia.length - 1) {
         setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
-      } else {
-        setGameStarted(false); // End game when all questions are answered
       }
     }, 3000); // 3-second delay
+  };
+
+  // End game and save score to localStorage
+  const endGame = () => {
+    setGameStarted(false);
+    const newScore = { score, date: new Date().toLocaleString() };
+    const updatedScoreboard = [...scoreboard, newScore];
+    setScoreboard(updatedScoreboard);
+    localStorage.setItem('scoreboard', JSON.stringify(updatedScoreboard));
   };
 
   return (
@@ -138,6 +149,27 @@ const App = () => {
             >
               Start Game
             </Button>
+          </div>
+          <div className="mt-5">
+            <h4 className="text-center">Scoreboard</h4>
+            <Table striped bordered hover>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Score</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {scoreboard.map((entry, index) => (
+                  <tr key={index}>
+                    <td>{index + 1}</td>
+                    <td>{entry.score}</td>
+                    <td>{entry.date}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
           </div>
         </>
       ) : loading ? (
