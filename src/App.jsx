@@ -14,6 +14,7 @@ const App = () => {
   const [categories, setCategories] = useState([]);
   const [feedback, setFeedback] = useState(null); // Feedback for correct/incorrect answers
   const [answerColors, setAnswerColors] = useState({}); // Colors for answer validation
+  const [isPaused, setIsPaused] = useState(false); // Pause state for the timer
 
   // Fetch trivia categories
   const fetchCategories = async () => {
@@ -29,7 +30,7 @@ const App = () => {
   const fetchTrivia = async () => {
     setLoading(true);
     setScore(0);
-    setTimeLeft(30);
+    setTimeLeft(100);
     setCurrentQuestionIndex(0);
     setFeedback(null);
     setAnswerColors({});
@@ -63,13 +64,13 @@ const App = () => {
 
   // Timer logic
   useEffect(() => {
-    if (gameStarted && timeLeft > 0) {
+    if (gameStarted && timeLeft > 0 && !isPaused) {
       const timer = setTimeout(() => setTimeLeft((prev) => prev - 1), 1000);
       return () => clearTimeout(timer);
     } else if (timeLeft === 0) {
       setGameStarted(false);
     }
-  }, [timeLeft, gameStarted]);
+  }, [timeLeft, gameStarted, isPaused]);
 
   // Handle answer submission
   const handleSubmitAnswer = () => {
@@ -90,12 +91,14 @@ const App = () => {
     }
 
     setAnswerColors(newAnswerColors);
+    setIsPaused(true); // Pause the timer during the transition
 
     // Delay before moving to the next question
     setTimeout(() => {
       setFeedback(null);
       setAnswerColors({});
       setSelectedAnswer(null);
+      setIsPaused(false); // Resume the timer after the transition
       if (currentQuestionIndex < trivia.length - 1) {
         setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
       } else {
