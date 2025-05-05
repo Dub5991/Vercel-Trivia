@@ -1,24 +1,44 @@
 import { useEffect, useState } from 'react';
-import { Container, Row, Col, Card, Button, Spinner } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Spinner, Form } from 'react-bootstrap';
 import axios from 'axios';
 
 const App = () => {
   const [trivia, setTrivia] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [score, setScore] = useState(0); // State for score
-  const [timeLeft, setTimeLeft] = useState(30); // State for timer
+  const [loading, setLoading] = useState(false);
+  const [score, setScore] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(30);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [gameStarted, setGameStarted] = useState(false);
+  const [category, setCategory] = useState('');
+  const [categories, setCategories] = useState([]);
 
-  // Fetch random trivia questions
+  // Fetch trivia categories
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get('https://opentdb.com/api_category.php');
+      setCategories(response.data.trivia_categories);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
+
+  // Fetch trivia questions
   const fetchTrivia = async () => {
     setLoading(true);
-    setScore(0); // Reset score when refreshing questions
-    setTimeLeft(30); // Reset timer when refreshing questions
+    setScore(0);
+    setTimeLeft(30);
+    setCurrentQuestionIndex(0);
     try {
-      const response = await axios.get('https://opentdb.com/api.php?amount=6&type=multiple');
+      const response = await axios.get(
+        `https://opentdb.com/api.php?amount=6&type=multiple&category=${category}`
+      );
       const triviaWithAnswers = response.data.results.map((question) => ({
         ...question,
-        showAnswer: false, // Add a field to track answer visibility
-        userAnswer: null, // Add a field to track user's selected answer
+        answers: shuffleAnswers([
+          ...question.incorrect_answers,
+          question.correct_answer,
+        ]),
       }));
       setTrivia(triviaWithAnswers);
     } catch (error) {
@@ -28,84 +48,120 @@ const App = () => {
     }
   };
 
+  // Shuffle answers for randomness
+  const shuffleAnswers = (answers) => {
+    return answers.sort(() => Math.random() - 0.5);
+  };
+
   useEffect(() => {
-    fetchTrivia();
+    fetchCategories();
   }, []);
 
   // Timer logic
   useEffect(() => {
-    if (timeLeft > 0) {
+    if (gameStarted && timeLeft > 0) {
       const timer = setTimeout(() => setTimeLeft((prev) => prev - 1), 1000);
       return () => clearTimeout(timer);
-    } else {
-      // Reset trivia when time runs out
-      fetchTrivia();
+    } else if (timeLeft === 0) {
+      setGameStarted(false);
     }
-  }, [timeLeft]);
+  }, [timeLeft, gameStarted]);
 
-  // Toggle the visibility of the answer and update score
-  const toggleAnswer = (index) => {
-    setTrivia((prevTrivia) =>
-      prevTrivia.map((question, i) => {
-        if (i === index) {
-          if (!question.showAnswer && question.correct_answer === question.userAnswer) {
-            setScore((prevScore) => prevScore + 1); // Increment score if the answer is correct
-          }
-          return { ...question, showAnswer: !question.showAnswer };
-        }
-        return question;
-      })
-    );
+  // Handle answer submission
+  const handleSubmitAnswer = () => {
+    if (selectedAnswer === trivia[currentQuestionIndex].correct_answer) {
+      setScore((prevScore) => prevScore + 1);
+    }
+    setSelectedAnswer(null);
+    if (currentQuestionIndex < trivia.length - 1) {
+      setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
+    } else {
+      setGameStarted(false); // End game when all questions are answered
+    }
   };
 
   return (
     <Container className="my-5">
       <h1 className="text-center mb-4">Trivia Time - Test Your Knowledge!</h1>
-      <div className="text-center mb-4">
-        <h4>Score: {score}</h4>
-        <h4>Time Left: {timeLeft}s</h4>
-      </div>
-      <div className="d-flex justify-content-center mb-4">
-        <Button variant="success" onClick={fetchTrivia}>
-          Refresh Questions
-        </Button>
-      </div>
-      {loading ? (
+      {!gameStarted ? (
+        <>
+          <div className="text-center mb-4">
+            <h4>Select a Category</h4>
+            <Form.Select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="mb-3"
+            >
+              <option value="">-- Select a Category --</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </Form.Select>
+            <Button
+              variant="primary"
+              onClick={() => {
+                if (category) {
+                  setGameStarted(true);
+                  fetchTrivia();
+                }
+              }}
+              disabled={!category}
+            >
+              Start Game
+            </Button>
+          </div>
+        </>
+      ) : loading ? (
         <div className="d-flex justify-content-center">
           <Spinner animation="grow" role="status" />
           <span className="sr-only">Loading...</span>
         </div>
       ) : (
-        <Row className="g-4">
-          {trivia.map((question, index) => (
-            <Col key={index} lg={6} className="d-flex">
-              <Card className="flex-fill shadow-sm">
+        <>
+          <div className="text-center mb-4">
+            <h4>Score: {score}</h4>
+            <h4>Time Left: {timeLeft}s</h4>
+          </div>
+          <Row className="justify-content-center">
+            <Col lg={6}>
+              <Card className="shadow-sm">
                 <Card.Header className="bg-primary text-white">
-                  Question #{index + 1}
+                  Question #{currentQuestionIndex + 1}
                 </Card.Header>
                 <Card.Body>
-                  <Card.Text dangerouslySetInnerHTML={{ __html: question.question }} />
-                  <Card.Footer className="text-muted">
-                    Category: {question.category}
-                  </Card.Footer>
-                  <div className="d-flex justify-content-between align-items-center mt-3">
-                    <Button
-                      variant={question.showAnswer ? "danger" : "info"}
-                      onClick={() => toggleAnswer(index)}
-                    >
-                      {question.showAnswer ? 'Hide Answer' : 'Show Answer'}
-                    </Button>
-                    {question.showAnswer && (
-                      <div>
-                        <strong>Answer:</strong> {question.correct_answer}
-                      </div>
-                    )}
-                  </div>
+                  <Card.Text
+                    dangerouslySetInnerHTML={{
+                      __html: trivia[currentQuestionIndex].question,
+                    }}
+                  />
+                  <Form>
+                    {trivia[currentQuestionIndex].answers.map((answer, index) => (
+                      <Form.Check
+                        key={index}
+                        type="radio"
+                        name="answer"
+                        label={answer}
+                        value={answer}
+                        checked={selectedAnswer === answer}
+                        onChange={(e) => setSelectedAnswer(e.target.value)}
+                      />
+                    ))}
+                  </Form>
+                  <Button
+                    variant="success"
+                    className="mt-3"
+                    onClick={handleSubmitAnswer}
+                    disabled={!selectedAnswer}
+                  >
+                    Submit Answer
+                  </Button>
                 </Card.Body>
               </Card>
             </Col>
-          ))}
-        </Row>
+          </Row>
+        </>
       )}
     </Container>
   );
