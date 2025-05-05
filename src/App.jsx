@@ -1,17 +1,19 @@
 import { useEffect, useState } from 'react';
-import { Container, Row, Col, Card, Button, Spinner, Form } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Spinner, Form, Alert } from 'react-bootstrap';
 import axios from 'axios';
 
 const App = () => {
   const [trivia, setTrivia] = useState([]);
   const [loading, setLoading] = useState(false);
   const [score, setScore] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(60);
+  const [timeLeft, setTimeLeft] = useState(30);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [gameStarted, setGameStarted] = useState(false);
   const [category, setCategory] = useState('');
   const [categories, setCategories] = useState([]);
+  const [feedback, setFeedback] = useState(null); // Feedback for correct/incorrect answers
+  const [answerColors, setAnswerColors] = useState({}); // Colors for answer validation
 
   // Fetch trivia categories
   const fetchCategories = async () => {
@@ -29,6 +31,8 @@ const App = () => {
     setScore(0);
     setTimeLeft(30);
     setCurrentQuestionIndex(0);
+    setFeedback(null);
+    setAnswerColors({});
     try {
       const response = await axios.get(
         `https://opentdb.com/api.php?amount=6&type=multiple&category=${category}`
@@ -69,15 +73,35 @@ const App = () => {
 
   // Handle answer submission
   const handleSubmitAnswer = () => {
-    if (selectedAnswer === trivia[currentQuestionIndex].correct_answer) {
-      setScore((prevScore) => prevScore + 1);
-    }
-    setSelectedAnswer(null);
-    if (currentQuestionIndex < trivia.length - 1) {
-      setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
+    const currentQuestion = trivia[currentQuestionIndex];
+    const newAnswerColors = {};
+
+    if (selectedAnswer === currentQuestion.correct_answer) {
+      setScore((prevScore) => prevScore + 1); // Add points for correct answer
+      setFeedback({ type: 'success', message: 'Correct!' });
+      newAnswerColors[currentQuestion.correct_answer] = 'success'; // Highlight correct answer in green
     } else {
-      setGameStarted(false); // End game when all questions are answered
+      setFeedback({
+        type: 'danger',
+        message: `Incorrect! The correct answer was: ${currentQuestion.correct_answer}.`,
+      });
+      newAnswerColors[selectedAnswer] = 'danger'; // Highlight incorrect answer in red
+      newAnswerColors[currentQuestion.correct_answer] = 'success'; // Highlight correct answer in green
     }
+
+    setAnswerColors(newAnswerColors);
+
+    // Delay before moving to the next question
+    setTimeout(() => {
+      setFeedback(null);
+      setAnswerColors({});
+      setSelectedAnswer(null);
+      if (currentQuestionIndex < trivia.length - 1) {
+        setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
+      } else {
+        setGameStarted(false); // End game when all questions are answered
+      }
+    }, 3000); // 3-second delay
   };
 
   return (
@@ -124,6 +148,11 @@ const App = () => {
             <h4>Score: {score}</h4>
             <h4>Time Left: {timeLeft}s</h4>
           </div>
+          {feedback && (
+            <Alert variant={feedback.type} className="text-center">
+              {feedback.message}
+            </Alert>
+          )}
           <Row className="justify-content-center">
             <Col lg={6}>
               <Card className="shadow-sm">
@@ -146,6 +175,14 @@ const App = () => {
                         value={answer}
                         checked={selectedAnswer === answer}
                         onChange={(e) => setSelectedAnswer(e.target.value)}
+                        className={`mb-2 ${
+                          answerColors[answer] === 'success'
+                            ? 'text-success'
+                            : answerColors[answer] === 'danger'
+                            ? 'text-danger'
+                            : ''
+                        }`}
+                        disabled={!!feedback} // Disable selection after submission
                       />
                     ))}
                   </Form>
@@ -153,7 +190,7 @@ const App = () => {
                     variant="success"
                     className="mt-3"
                     onClick={handleSubmitAnswer}
-                    disabled={!selectedAnswer}
+                    disabled={!selectedAnswer || feedback !== null}
                   >
                     Submit Answer
                   </Button>
