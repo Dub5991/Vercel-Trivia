@@ -89,7 +89,7 @@ const App = () => {
     } else if (timeLeft === 0 && gameMode === 'Timed Mode') {
       endGame(); // End game when time runs out in Timed Mode
     }
-  }, [timeLeft, gameStarted, isPaused]);
+  }, [timeLeft, gameStarted, isPaused, endGame, gameMode]);
 
   // Handle answer submission
   const handleSubmitAnswer = () => {
