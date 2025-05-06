@@ -36,7 +36,7 @@ const App = () => {
     setAnswerColors({});
     try {
       const response = await axios.get(
-        `https://opentdb.com/api.php?amount=6&type=multiple&category=${category}`
+        `https://opentdb.com/api.php?amount=1000&type=multiple&category=${category}`
       );
       const triviaWithAnswers = response.data.results.map((question) => ({
         ...question,
@@ -45,9 +45,14 @@ const App = () => {
           question.correct_answer,
         ]),
       }));
-      setTrivia((prevTrivia) => [...prevTrivia, ...triviaWithAnswers]); // Append new questions for infinite play
+
       if (gameMode === 'Endless Mode') {
-        setCurrentQuestionIndex(0); // Reset the question index for Endless Mode
+        // Replace trivia with new questions and reset index
+        setTrivia(triviaWithAnswers);
+        setCurrentQuestionIndex(0);
+      } else {
+        // Append new questions for other modes
+        setTrivia((prevTrivia) => [...prevTrivia, ...triviaWithAnswers]);
       }
     } catch (error) {
       console.error('Error fetching trivia:', error);
