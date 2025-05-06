@@ -46,6 +46,9 @@ const App = () => {
         ]),
       }));
       setTrivia((prevTrivia) => [...prevTrivia, ...triviaWithAnswers]); // Append new questions for infinite play
+      if (gameMode === 'Endless Mode') {
+        setCurrentQuestionIndex(0); // Reset the question index for Endless Mode
+      }
     } catch (error) {
       console.error('Error fetching trivia:', error);
     } finally {
@@ -125,13 +128,13 @@ const App = () => {
   };
 
   return (
-    <Container className="my-5">
-      <h1 className="text-center mb-4" style={{ color: '#FFD700', fontWeight: 'bold' }}>
+    <Container className="my-5" style={{ backgroundColor: '#FFFFFF', padding: '20px', borderRadius: '10px' }}>
+      <h1 className="text-center mb-4" style={{ color: '#333333', fontWeight: 'bold' }}>
         Trivia Time 🎉
       </h1>
       {!gameStarted ? (
         <>
-          <Card className="p-4 shadow-lg" style={{ backgroundColor: '#4B0082', color: '#FFFFFF' }}>
+          <Card className="p-4 shadow-lg" style={{ backgroundColor: '#F8F9FA', color: '#333333' }}>
             <Card.Body>
               <h4 className="text-center mb-4">Enter Your Username</h4>
               <Form.Control
@@ -166,7 +169,7 @@ const App = () => {
               </Form.Select>
               <div className="text-center">
                 <Button
-                  variant="warning"
+                  variant="primary"
                   size="lg"
                   onClick={() => {
                     if (username && gameMode && category) {
@@ -182,8 +185,8 @@ const App = () => {
             </Card.Body>
           </Card>
           <div className="mt-5">
-            <h4 className="text-center" style={{ color: '#FFD700' }}>Scoreboard</h4>
-            <Table striped bordered hover variant="dark">
+            <h4 className="text-center" style={{ color: '#333333' }}>Scoreboard</h4>
+            <Table striped bordered hover>
               <thead>
                 <tr>
                   <th>#</th>
@@ -215,7 +218,7 @@ const App = () => {
       ) : (
         <>
           <div className="text-center mb-4">
-            <h4 style={{ color: '#FFD700' }}>Score: {score}</h4>
+            <h4 style={{ color: '#333333' }}>Score: {score}</h4>
             <ProgressBar
               now={(timeLeft / 100) * 100}
               label={`${timeLeft}s`}
@@ -230,8 +233,8 @@ const App = () => {
           )}
           <Row className="justify-content-center">
             <Col lg={8}>
-              <Card className="shadow-lg" style={{ backgroundColor: '#4B0082', color: '#FFFFFF' }}>
-                <Card.Header className="text-center" style={{ backgroundColor: '#FFD700' }}>
+              <Card className="shadow-lg" style={{ backgroundColor: '#F8F9FA', color: '#333333' }}>
+                <Card.Header className="text-center" style={{ backgroundColor: '#007BFF', color: '#FFFFFF' }}>
                   <strong>Question #{currentQuestionIndex + 1}</strong>
                 </Card.Header>
                 <Card.Body>
