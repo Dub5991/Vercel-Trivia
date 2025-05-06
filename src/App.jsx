@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Container, Row, Col, Card, Button, Spinner, Form, Alert, Table } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Spinner, Form, Alert, Table, ProgressBar } from 'react-bootstrap';
 import axios from 'axios';
 
 const App = () => {
@@ -119,59 +119,71 @@ const App = () => {
     localStorage.setItem('scoreboard', JSON.stringify(updatedScoreboard));
   };
 
+  // Quit game and save current score
+  const quitGame = () => {
+    endGame(); // Call the endGame function to save the current score
+  };
+
   return (
     <Container className="my-5">
-      <h1 className="text-center mb-4">Trivia Time - Test Your Knowledge!</h1>
+      <h1 className="text-center mb-4" style={{ color: '#FFD700', fontWeight: 'bold' }}>
+        Trivia Time 🎉
+      </h1>
       {!gameStarted ? (
         <>
-          <div className="text-center mb-4">
-            <h4>Enter Your Username</h4>
-            <Form.Control
-              type="text"
-              placeholder="Enter your username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="mb-3"
-            />
-            <h4>Select a Game Mode</h4>
-            <Form.Select
-              value={gameMode}
-              onChange={(e) => setGameMode(e.target.value)}
-              className="mb-3"
-            >
-              <option value="">-- Select a Game Mode --</option>
-              <option value="Timed Mode">Timed Mode</option>
-              <option value="Endless Mode">Endless Mode</option>
-            </Form.Select>
-            <h4>Select a Category</h4>
-            <Form.Select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="mb-3"
-            >
-              <option value="">-- Select a Category --</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </Form.Select>
-            <Button
-              variant="primary"
-              onClick={() => {
-                if (username && gameMode && category) {
-                  setGameStarted(true);
-                  fetchTrivia();
-                }
-              }}
-              disabled={!username || !gameMode || !category}
-            >
-              Start Game
-            </Button>
-          </div>
+          <Card className="p-4 shadow-lg" style={{ backgroundColor: '#4B0082', color: '#FFFFFF' }}>
+            <Card.Body>
+              <h4 className="text-center mb-4">Enter Your Username</h4>
+              <Form.Control
+                type="text"
+                placeholder="Enter your username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="mb-3"
+              />
+              <h4 className="text-center mb-4">Select a Game Mode</h4>
+              <Form.Select
+                value={gameMode}
+                onChange={(e) => setGameMode(e.target.value)}
+                className="mb-3"
+              >
+                <option value="">-- Select a Game Mode --</option>
+                <option value="Timed Mode">Timed Mode</option>
+                <option value="Endless Mode">Endless Mode</option>
+              </Form.Select>
+              <h4 className="text-center mb-4">Select a Category</h4>
+              <Form.Select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="mb-3"
+              >
+                <option value="">-- Select a Category --</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </Form.Select>
+              <div className="text-center">
+                <Button
+                  variant="warning"
+                  size="lg"
+                  onClick={() => {
+                    if (username && gameMode && category) {
+                      setGameStarted(true);
+                      fetchTrivia();
+                    }
+                  }}
+                  disabled={!username || !gameMode || !category}
+                >
+                  Start Game
+                </Button>
+              </div>
+            </Card.Body>
+          </Card>
           <div className="mt-5">
-            <h4 className="text-center">Scoreboard</h4>
-            <Table striped bordered hover>
+            <h4 className="text-center" style={{ color: '#FFD700' }}>Scoreboard</h4>
+            <Table striped bordered hover variant="dark">
               <thead>
                 <tr>
                   <th>#</th>
@@ -203,8 +215,13 @@ const App = () => {
       ) : (
         <>
           <div className="text-center mb-4">
-            <h4>Score: {score}</h4>
-            <h4>Time Left: {timeLeft}s</h4>
+            <h4 style={{ color: '#FFD700' }}>Score: {score}</h4>
+            <ProgressBar
+              now={(timeLeft / 100) * 100}
+              label={`${timeLeft}s`}
+              variant="info"
+              className="mb-3"
+            />
           </div>
           {feedback && (
             <Alert variant={feedback.type} className="text-center">
@@ -212,16 +229,17 @@ const App = () => {
             </Alert>
           )}
           <Row className="justify-content-center">
-            <Col lg={6}>
-              <Card className="shadow-sm">
-                <Card.Header className="bg-primary text-white">
-                  Question #{currentQuestionIndex + 1}
+            <Col lg={8}>
+              <Card className="shadow-lg" style={{ backgroundColor: '#4B0082', color: '#FFFFFF' }}>
+                <Card.Header className="text-center" style={{ backgroundColor: '#FFD700' }}>
+                  <strong>Question #{currentQuestionIndex + 1}</strong>
                 </Card.Header>
                 <Card.Body>
                   <Card.Text
                     dangerouslySetInnerHTML={{
                       __html: trivia[currentQuestionIndex].question,
                     }}
+                    className="fs-5"
                   />
                   <Form>
                     {trivia[currentQuestionIndex].answers.map((answer, index) => (
@@ -244,14 +262,24 @@ const App = () => {
                       />
                     ))}
                   </Form>
-                  <Button
-                    variant="success"
-                    className="mt-3"
-                    onClick={handleSubmitAnswer}
-                    disabled={!selectedAnswer || feedback !== null}
-                  >
-                    Submit Answer
-                  </Button>
+                  <div className="text-center mt-4">
+                    <Button
+                      variant="success"
+                      size="lg"
+                      onClick={handleSubmitAnswer}
+                      disabled={!selectedAnswer || feedback !== null}
+                    >
+                      Submit Answer
+                    </Button>
+                    <Button
+                      variant="danger"
+                      size="lg"
+                      className="ms-3"
+                      onClick={quitGame}
+                    >
+                      Quit Game
+                    </Button>
+                  </div>
                 </Card.Body>
               </Card>
             </Col>
