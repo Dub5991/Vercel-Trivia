@@ -16,6 +16,8 @@ const App = () => {
   const [answerColors, setAnswerColors] = useState({}); // Colors for answer validation
   const [isPaused, setIsPaused] = useState(false); // Pause state for the timer
   const [scoreboard, setScoreboard] = useState([]); // Scoreboard to track scores
+  const [username, setUsername] = useState(''); // Username input
+  const [gameMode, setGameMode] = useState(''); // Selected game mode
 
   // Fetch trivia categories
   const fetchCategories = async () => {
@@ -30,9 +32,6 @@ const App = () => {
   // Fetch trivia questions
   const fetchTrivia = async () => {
     setLoading(true);
-    setScore(0);
-    setTimeLeft(100);
-    setCurrentQuestionIndex(0);
     setFeedback(null);
     setAnswerColors({});
     try {
@@ -46,7 +45,7 @@ const App = () => {
           question.correct_answer,
         ]),
       }));
-      setTrivia(triviaWithAnswers);
+      setTrivia((prevTrivia) => [...prevTrivia, ...triviaWithAnswers]); // Append new questions for infinite play
     } catch (error) {
       console.error('Error fetching trivia:', error);
     } finally {
@@ -71,8 +70,8 @@ const App = () => {
     if (gameStarted && timeLeft > 0 && !isPaused) {
       const timer = setTimeout(() => setTimeLeft((prev) => prev - 1), 1000);
       return () => clearTimeout(timer);
-    } else if (timeLeft === 0) {
-      endGame(); // End game when time runs out
+    } else if (timeLeft === 0 && gameMode === 'Timed Mode') {
+      endGame(); // End game when time runs out in Timed Mode
     }
   }, [timeLeft, gameStarted, isPaused]);
 
@@ -105,6 +104,8 @@ const App = () => {
       setIsPaused(false); // Resume the timer after the transition
       if (currentQuestionIndex < trivia.length - 1) {
         setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
+      } else if (gameMode === 'Endless Mode') {
+        fetchTrivia(); // Fetch more questions in Endless Mode
       }
     }, 3000); // 3-second delay
   };
@@ -112,7 +113,7 @@ const App = () => {
   // End game and save score to localStorage
   const endGame = () => {
     setGameStarted(false);
-    const newScore = { score, date: new Date().toLocaleString() };
+    const newScore = { username, score, gameMode, date: new Date().toLocaleString() };
     const updatedScoreboard = [...scoreboard, newScore];
     setScoreboard(updatedScoreboard);
     localStorage.setItem('scoreboard', JSON.stringify(updatedScoreboard));
@@ -124,6 +125,24 @@ const App = () => {
       {!gameStarted ? (
         <>
           <div className="text-center mb-4">
+            <h4>Enter Your Username</h4>
+            <Form.Control
+              type="text"
+              placeholder="Enter your username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="mb-3"
+            />
+            <h4>Select a Game Mode</h4>
+            <Form.Select
+              value={gameMode}
+              onChange={(e) => setGameMode(e.target.value)}
+              className="mb-3"
+            >
+              <option value="">-- Select a Game Mode --</option>
+              <option value="Timed Mode">Timed Mode</option>
+              <option value="Endless Mode">Endless Mode</option>
+            </Form.Select>
             <h4>Select a Category</h4>
             <Form.Select
               value={category}
@@ -140,12 +159,12 @@ const App = () => {
             <Button
               variant="primary"
               onClick={() => {
-                if (category) {
+                if (username && gameMode && category) {
                   setGameStarted(true);
                   fetchTrivia();
                 }
               }}
-              disabled={!category}
+              disabled={!username || !gameMode || !category}
             >
               Start Game
             </Button>
@@ -156,7 +175,9 @@ const App = () => {
               <thead>
                 <tr>
                   <th>#</th>
+                  <th>Username</th>
                   <th>Score</th>
+                  <th>Game Mode</th>
                   <th>Date</th>
                 </tr>
               </thead>
@@ -164,7 +185,9 @@ const App = () => {
                 {scoreboard.map((entry, index) => (
                   <tr key={index}>
                     <td>{index + 1}</td>
+                    <td>{entry.username}</td>
                     <td>{entry.score}</td>
+                    <td>{entry.gameMode}</td>
                     <td>{entry.date}</td>
                   </tr>
                 ))}
