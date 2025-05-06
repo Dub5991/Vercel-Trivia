@@ -2,6 +2,13 @@ import { useEffect, useState } from 'react';
 import { Container, Row, Col, Card, Button, Spinner, Form, Alert, Table, ProgressBar } from 'react-bootstrap';
 import axios from 'axios';
 
+// Helper function to decode HTML entities
+const decodeHtml = (html) => {
+  const txt = document.createElement('textarea');
+  txt.innerHTML = html;
+  return txt.value;
+};
+
 const App = () => {
   const [trivia, setTrivia] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -40,9 +47,10 @@ const App = () => {
       );
       const triviaWithAnswers = response.data.results.map((question) => ({
         ...question,
+        question: decodeHtml(question.question), // Decode question text
         answers: shuffleAnswers([
-          ...question.incorrect_answers,
-          question.correct_answer,
+          ...question.incorrect_answers.map(decodeHtml), // Decode incorrect answers
+          decodeHtml(question.correct_answer), // Decode correct answer
         ]),
       }));
 
@@ -115,7 +123,7 @@ const App = () => {
       } else if (gameMode === 'Endless Mode') {
         fetchTrivia(); // Fetch more questions in Endless Mode
       }
-    }, 3000); // 3-second delay
+    }, 1000); // 1-second delay
   };
 
   // End game and save score to localStorage
