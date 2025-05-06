@@ -13,7 +13,7 @@ const App = () => {
   const [trivia, setTrivia] = useState([]);
   const [loading, setLoading] = useState(false);
   const [score, setScore] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(100);
+  const [timeLeft, setTimeLeft] = useState(100); // Timer starts at 100 seconds
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [gameStarted, setGameStarted] = useState(false);
@@ -98,7 +98,8 @@ const App = () => {
 
     if (selectedAnswer === currentQuestion.correct_answer) {
       setScore((prevScore) => prevScore + 1); // Add points for correct answer
-      setFeedback({ type: 'success', message: 'Correct!' });
+      setTimeLeft((prevTime) => prevTime + 5); // Add 5 seconds to the timer
+      setFeedback({ type: 'success', message: 'Correct! 5 seconds added to the timer!' });
       newAnswerColors[currentQuestion.correct_answer] = 'success'; // Highlight correct answer in green
     } else {
       setFeedback({
@@ -129,7 +130,13 @@ const App = () => {
   // End game and save score to localStorage
   const endGame = () => {
     setGameStarted(false);
-    const newScore = { username, score, gameMode, date: new Date().toLocaleString() };
+    const newScore = {
+      username,
+      score,
+      gameMode,
+      remainingTime: timeLeft, // Save remaining time to the scoreboard
+      date: new Date().toLocaleString(),
+    };
     const updatedScoreboard = [...scoreboard, newScore];
     setScoreboard(updatedScoreboard);
     localStorage.setItem('scoreboard', JSON.stringify(updatedScoreboard));
@@ -138,6 +145,15 @@ const App = () => {
   // Quit game and save current score
   const quitGame = () => {
     endGame(); // Call the endGame function to save the current score
+  };
+
+  // Start a new game
+  const startNewGame = () => {
+    setGameStarted(true);
+    setScore(0); // Reset score
+    setTimeLeft(100); // Reset timer to 100 seconds
+    setCurrentQuestionIndex(0); // Reset question index
+    fetchTrivia(); // Fetch new trivia questions
   };
 
   return (
@@ -184,12 +200,7 @@ const App = () => {
                 <Button
                   variant="primary"
                   size="lg"
-                  onClick={() => {
-                    if (username && gameMode && category) {
-                      setGameStarted(true);
-                      fetchTrivia();
-                    }
-                  }}
+                  onClick={startNewGame}
                   disabled={!username || !gameMode || !category}
                 >
                   Start Game
@@ -205,6 +216,7 @@ const App = () => {
                   <th>#</th>
                   <th>Username</th>
                   <th>Score</th>
+                  <th>Remaining Time</th>
                   <th>Game Mode</th>
                   <th>Date</th>
                 </tr>
@@ -215,6 +227,7 @@ const App = () => {
                     <td>{index + 1}</td>
                     <td>{entry.username}</td>
                     <td>{entry.score}</td>
+                    <td>{entry.remainingTime}s</td>
                     <td>{entry.gameMode}</td>
                     <td>{entry.date}</td>
                   </tr>
