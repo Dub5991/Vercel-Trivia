@@ -1,0 +1,117 @@
+/* General Styling */
+.about-container {
+  background: linear-gradient(135deg, #1e1e2f, #2a2a40);
+  color: #ffffff;
+  padding: 50px;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  animation: fadeIn 1s ease-in-out;
+}
+
+.about-title {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #ff6f61;
+  text-transform: uppercase;
+  animation: slideInFromLeft 1s ease-in-out;
+}
+
+.about-subtitle {
+  font-size: 1.5rem;
+  color: #d1d1e0;
+  margin-top: 10px;
+  animation: fadeIn 1.5s ease-in-out;
+}
+
+.about-card {
+  background: #2a2a40;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.about-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+}
+
+.about-heading {
+  font-size: 1.8rem;
+  color: #ff6f61;
+  margin-bottom: 15px;
+}
+
+.about-link {
+  color: #ff6f61;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.about-link:hover {
+  color: #ffffff;
+}
+
+.gallery-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.gallery-item {
+  width: 150px;
+  height: 150px;
+  background: #3a3a50;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 1.2rem;
+  font-weight: bold;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.gallery-item:hover {
+  transform: scale(1.1);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+}
+
+.about-button {
+  background: #ff6f61;
+  border: none;
+  padding: 15px 30px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #ffffff;
+  border-radius: 50px;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.about-button:hover {
+  background: #ff856f;
+  transform: scale(1.1);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

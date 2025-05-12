@@ -1,0 +1,38 @@
+/* General Reset and Base Styles */
+html, body {
+  height: 100%; /* Ensure the body takes up the full height of the viewport */
+  margin: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 100%;
+  line-height: 1.6;
+  background: linear-gradient(135deg, #1e3c72, #2a5298, #1e3c72);
+  color: #ffffff;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%; /* Ensure the root container takes up the full height */
+}
+
+.container {
+  flex: 1; /* Allow the main content to grow and push the footer to the bottom */
+  max-width: 1200px;
+  padding: 0 15px;
+  margin: auto;
+}
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  .navbar-brand {
+    font-size: 1.5rem;
+  }
+}
