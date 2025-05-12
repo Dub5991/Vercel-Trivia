@@ -23,7 +23,7 @@ const AuthForm = () => {
         // Login logic
         await signInWithEmailAndPassword(auth, email, password);
         console.log("User logged in successfully!");
-        navigate("/"); // Redirect to home page after login
+        navigate("/about"); // Redirect to About page after login
       } else {
         // Signup logic
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -73,6 +73,7 @@ const AuthForm = () => {
             src="../Trivia.png"
             className="rounded shadow"
             style={{ maxWidth: "100%", height: "auto", maxHeight: "300px" }}
+            alt="Trivia Time"
           />
         </Col>
 

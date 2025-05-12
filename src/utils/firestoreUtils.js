@@ -7,7 +7,6 @@ import { db } from "./firebaseConfig";
  */
 export const saveGameResult = async ({ username, score, gameMode, remainingTime }) => {
   try {
-    // Validate required fields
     if (!username || typeof username !== "string") {
       throw new Error("Invalid username");
     }
@@ -21,13 +20,12 @@ export const saveGameResult = async ({ username, score, gameMode, remainingTime 
       throw new Error("Invalid remaining time");
     }
 
-    // Save to Firestore
     await addDoc(collection(db, "scoreboard"), {
       username,
       score,
       gameMode,
       remainingTime,
-      date: new Date().toISOString(), // Ensure date is always valid
+      date: new Date().toISOString(),
     });
     console.log("Game result saved successfully!");
   } catch (error) {

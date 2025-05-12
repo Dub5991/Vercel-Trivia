@@ -51,7 +51,7 @@ const Home = () => {
 
     try {
       const response = await axios.get(
-        `https://opentdb.com/api.php?amount=10&category=${category}&type=multiple`
+        `https://opentdb.com/api.php?amount=1000&category=${category}&type=multiple`
       );
 
       if (!response.data.results || response.data.results.length === 0) {

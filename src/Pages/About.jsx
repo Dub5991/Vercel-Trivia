@@ -1,16 +1,18 @@
-// Import the functions you need from the SDKs you need
+import React from "react";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { auth } from "../utils/firebaseConfig"; // Import Firebase auth
 import AppNavbar from "../components/Navbar";
 import Footer from "./Footer";
+import "../styles/About.css";
 
 const About = () => {
   const navigate = useNavigate();
 
   const handleStartPlaying = () => {
-    const user = localStorage.getItem("user"); // Check if user is authenticated
+    const user = auth.currentUser; // Check if the user is authenticated
     if (user) {
-      navigate("/home"); // Navigate to Home if authenticated
+      navigate("/home"); // Navigate to Home where the game setup is displayed
     } else {
       navigate("/login"); // Navigate to Login if not authenticated
     }

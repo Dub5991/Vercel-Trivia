@@ -1,8 +1,8 @@
 import { Table, Container, Spinner } from "react-bootstrap";
 import { useEffect, useState } from "react";
-import { listenToScoreboard } from "../utils/firestoreUtils"; // Correctly import listenToScoreboard
+import { listenToScoreboard } from "../utils/firestoreUtils";
 import AppNavbar from "../components/Navbar";
-import Footer from "../Pages/Footer";
+import Footer from "./Footer";
 
 const Scoreboard = () => {
   const [globalScoreboard, setGlobalScoreboard] = useState([]);
@@ -13,7 +13,8 @@ const Scoreboard = () => {
       setGlobalScoreboard(data);
       setLoading(false);
     });
-    return () => unsubscribe();
+
+    return () => unsubscribe(); // Cleanup listener on component unmount
   }, []);
 
   return (

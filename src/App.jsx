@@ -1,8 +1,9 @@
+import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./Pages/Home";
-import Login from "./Pages/Login";
 import Scoreboard from "./Pages/Scoreboard";
 import About from "./Pages/About";
+import AuthForm from "./components/AuthForm"; // Handles login and signup
 import ProtectedRoute from "./components/ProtectedRoute";
 
 const App = () => {
@@ -10,7 +11,7 @@ const App = () => {
     <Router>
       <Routes>
         {/* Public Routes */}
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<AuthForm />} />
 
         {/* Protected Routes */}
         <Route
@@ -39,7 +40,7 @@ const App = () => {
         />
 
         {/* Default Route */}
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<AuthForm />} />
       </Routes>
     </Router>
   );
