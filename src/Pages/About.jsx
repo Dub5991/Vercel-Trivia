@@ -1,5 +1,6 @@
 import React from "react";
 import { Container, Row, Col, Button } from "react-bootstrap";
+<<<<<<< HEAD
 import { useNavigate } from "react-router-dom";
 import AppNavbar from "../components/Navbar";
 import Footer from "./Footer";
@@ -12,6 +13,13 @@ const About = () => {
     navigate("/home"); // Navigate to the Home page
   };
 
+=======
+import AppNavbar from "../components/Navbar";
+import Footer from "./Footer";
+import "../styles/About.css"; // Import custom CSS for animations and styling
+
+const About = () => {
+>>>>>>> 9024413857412afe176ccbf5f806eb68ca937cd6
   return (
     <>
       <AppNavbar />
@@ -43,6 +51,7 @@ const About = () => {
         </Row>
         <Row className="mb-5">
           <Col md={6} className="about-card">
+<<<<<<< HEAD
             <h2 className="about-heading">Meet the Developer</h2>
             <p>
               A passionate developer and trivia enthusiast on a mission to deliver the ultimate gaming experience.
@@ -54,10 +63,24 @@ const About = () => {
               Got feedback? Reach out to me{" "}
               <a href="mailto:Snellingsd@icloud.com" className="about-link">
                 Here
+=======
+            <h2 className="about-heading">Meet the Team</h2>
+            <p>
+              A squad of developers and trivia enthusiasts on a mission to deliver the ultimate gaming experience.
+            </p>
+          </Col>
+          <Col md={6} className="about-card">
+            <h2 className="about-heading">Contact Us</h2>
+            <p>
+              Got feedback? Reach out me{" "}
+              <a href="mailto:Snellingsd@icloud.com" className="about-link">
+                 :)
+>>>>>>> 9024413857412afe176ccbf5f806eb68ca937cd6
               </a>.
             </p>
           </Col>
         </Row>
+<<<<<<< HEAD
         <Row className="text-center mt-5">
           <Col>
             <Button
@@ -65,6 +88,21 @@ const About = () => {
               className="about-button"
               onClick={handleStartPlaying}
             >
+=======
+        <Row>
+          <Col>
+            <h2 className="about-heading text-center">Gallery</h2>
+            <div className="gallery-container">
+              <div className="gallery-item">Image 1</div>
+              <div className="gallery-item">Image 2</div>
+              <div className="gallery-item">Image 3</div>
+            </div>
+          </Col>
+        </Row>
+        <Row className="text-center mt-5">
+          <Col>
+            <Button variant="primary" className="about-button">
+>>>>>>> 9024413857412afe176ccbf5f806eb68ca937cd6
               Start Playing Now
             </Button>
           </Col>

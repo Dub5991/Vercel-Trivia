@@ -52,3 +52,4 @@ const Login = () => {
 };
 
 export default Login;
+// Removed duplicate Login component and its export
