@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
-import PropTypes from "prop-types";
 import axios from "axios";
 import { Container } from "react-bootstrap";
 import GameSetup from "../components/GameSetup";
 import GameInterface from "../components/GameInterface";
 import AppNavbar from "../components/Navbar";
-import Footer from "../Pages/Footer";
+import Footer from "./Footer";
 import { saveGameResult } from "../utils/firestoreUtils";
 
 const decodeHtmlEntities = (text) => {
@@ -24,8 +23,8 @@ const Home = () => {
   const [feedback, setFeedback] = useState(null);
   const [answerColors, setAnswerColors] = useState({});
   const [timeLeft, setTimeLeft] = useState(60);
-  const [username, setUsername] = useState(""); // Store username
-  const [gameMode, setGameMode] = useState(""); // Store game mode
+  const [username, setUsername] = useState("");
+  const [gameMode, setGameMode] = useState("");
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -40,8 +39,8 @@ const Home = () => {
   }, []);
 
   const startNewGame = async ({ username, gameMode, category }) => {
-    setUsername(username); // Save username
-    setGameMode(gameMode); // Save game mode
+    setUsername(username);
+    setGameMode(gameMode);
     setGameStarted(false);
     setScore(0);
     setCurrentQuestionIndex(0);
@@ -52,7 +51,7 @@ const Home = () => {
 
     try {
       const response = await axios.get(
-        `https://opentdb.com/api.php?amount=1000&category=${category}&type=multiple`
+        `https://opentdb.com/api.php?amount=10&category=${category}&type=multiple`
       );
 
       if (!response.data.results || response.data.results.length === 0) {
@@ -78,7 +77,7 @@ const Home = () => {
 
   const endGame = () => {
     saveGameResult({
-      username: username || "Guest", // Use the username from GameSetup
+      username: username || "Guest",
       score,
       remainingTime: timeLeft || 0,
       gameMode: gameMode || "Default Mode",

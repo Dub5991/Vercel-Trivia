@@ -1,4 +1,24 @@
-import { useState } from "react";
+import React from "react";
+import { Navigate } from "react-router-dom";
+import AuthForm from "../components/AuthForm";
+import { auth } from "../utils/firebaseConfig";
+
+const Login = () => {
+  const user = auth.currentUser;
+
+  if (user) {
+    return <Navigate to="/" />;
+  }
+
+  return (
+    <div>
+      <AuthForm />
+    </div>
+  );
+};
+
+export default Login;
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, Form, Button, Alert } from "react-bootstrap";
 
@@ -52,4 +72,3 @@ const Login = () => {
 };
 
 export default Login;
-// Removed duplicate Login component and its export
